@@ -1,6 +1,6 @@
 ﻿namespace hexMapMaker_CS
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         /// 必需的设计器变量。
@@ -37,7 +37,8 @@
             this.othersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.zdn = new System.Windows.Forms.Button();
-            this.generate = new System.Windows.Forms.Button();
+            this.Generate = new System.Windows.Forms.Button();
+            this.DebugLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -47,7 +48,7 @@
             // 
             this.pictureBox1.Location = new System.Drawing.Point(12, 28);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(763, 358);
+            this.pictureBox1.Size = new System.Drawing.Size(763, 205);
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
@@ -123,7 +124,7 @@
             this.tableLayoutPanel1.Controls.Add(this.adn, 6, 1);
             this.tableLayoutPanel1.Controls.Add(this.aup, 5, 1);
             this.tableLayoutPanel1.Controls.Add(this.zdn, 4, 1);
-            this.tableLayoutPanel1.Controls.Add(this.generate, 2, 1);
+            this.tableLayoutPanel1.Controls.Add(this.Generate, 2, 1);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(13, 393);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 2;
@@ -141,27 +142,40 @@
             this.zdn.TabIndex = 6;
             this.zdn.Text = "Zoom -";
             this.zdn.UseVisualStyleBackColor = true;
+            this.zdn.Click += new System.EventHandler(this.zdn_Click);
             // 
-            // generate
+            // Generate
             // 
-            this.generate.Location = new System.Drawing.Point(23, 33);
-            this.generate.Name = "generate";
-            this.generate.Size = new System.Drawing.Size(75, 23);
-            this.generate.TabIndex = 7;
-            this.generate.Text = "Generate";
-            this.generate.UseVisualStyleBackColor = true;
+            this.Generate.Location = new System.Drawing.Point(23, 33);
+            this.Generate.Name = "Generate";
+            this.Generate.Size = new System.Drawing.Size(75, 23);
+            this.Generate.TabIndex = 7;
+            this.Generate.Text = "Generate";
+            this.Generate.UseVisualStyleBackColor = true;
+            this.Generate.Click += new System.EventHandler(this.Generate_Click);
             // 
-            // Form1
+            // DebugLabel
+            // 
+            this.DebugLabel.AutoSize = true;
+            this.DebugLabel.Location = new System.Drawing.Point(45, 275);
+            this.DebugLabel.Name = "DebugLabel";
+            this.DebugLabel.Size = new System.Drawing.Size(35, 12);
+            this.DebugLabel.TabIndex = 8;
+            this.DebugLabel.Text = "DEBUG";
+            // 
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(787, 466);
+            this.Controls.Add(this.DebugLabel);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.tableLayoutPanel1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "Form1";
+            this.Name = "MainForm";
             this.Text = "Form1";
+            this.Activated += new System.EventHandler(this.MainForm_Activated);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -182,7 +196,8 @@
         private System.Windows.Forms.ToolStripMenuItem othersToolStripMenuItem;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Button zdn;
-        private System.Windows.Forms.Button generate;
+        private System.Windows.Forms.Button Generate;
+        private System.Windows.Forms.Label DebugLabel;
     }
 }
 

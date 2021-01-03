@@ -10,10 +10,14 @@ using System.Drawing;
 
 namespace hexMapMaker_CS
 {
+
     static class SETTINGS
     {
         static public int WIDTH = 40;
         static public int HEIGHT = 40;
+        static public int ROW = 120;
+        static public int COL = 120;
+        static public bool TRUE_COL = true;
         public static int[] XPT_TC = { WIDTH * 3 / 4, WIDTH, WIDTH * 3 / 4, WIDTH / 4, 0, WIDTH / 4 };
         public static int[] YPT_TC ={ 0, HEIGHT / 2, HEIGHT, HEIGHT, HEIGHT / 2, 0 };
         public static int[] XPT_TR = { 0, WIDTH / 2, WIDTH, WIDTH, WIDTH / 2, 0 };

@@ -16,7 +16,8 @@ namespace hexMapMaker_CS
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            MainForm mf = new MainForm();
+            Application.Run(mf);
         }
     }
 }

@@ -38,8 +38,11 @@
             this.zdn = new System.Windows.Forms.Button();
             this.Generate = new System.Windows.Forms.Button();
             this.DebugLabel = new System.Windows.Forms.Label();
+            this.drawTile = new System.Windows.Forms.Button();
+            this.panview = new System.Windows.Forms.Button();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.debugText = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -49,7 +52,7 @@
             // zup
             // 
             this.zup.Location = new System.Drawing.Point(146, 42);
-            this.zup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.zup.Margin = new System.Windows.Forms.Padding(4);
             this.zup.Name = "zup";
             this.zup.Size = new System.Drawing.Size(83, 29);
             this.zup.TabIndex = 2;
@@ -60,7 +63,7 @@
             // aup
             // 
             this.aup.Location = new System.Drawing.Point(494, 42);
-            this.aup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.aup.Margin = new System.Windows.Forms.Padding(4);
             this.aup.Name = "aup";
             this.aup.Size = new System.Drawing.Size(100, 29);
             this.aup.TabIndex = 4;
@@ -71,7 +74,7 @@
             // adn
             // 
             this.adn.Location = new System.Drawing.Point(865, 42);
-            this.adn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.adn.Margin = new System.Windows.Forms.Padding(4);
             this.adn.Name = "adn";
             this.adn.Size = new System.Drawing.Size(100, 29);
             this.adn.TabIndex = 5;
@@ -87,7 +90,7 @@
             this.othersToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1049, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(1049, 28);
             this.menuStrip1.TabIndex = 6;
             this.menuStrip1.Text = "menuStrip1";
             this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
@@ -95,14 +98,14 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(48, 26);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(48, 24);
             this.fileToolStripMenuItem.Text = "File";
             this.fileToolStripMenuItem.Click += new System.EventHandler(this.fileToolStripMenuItem_Click);
             // 
             // othersToolStripMenuItem
             // 
             this.othersToolStripMenuItem.Name = "othersToolStripMenuItem";
-            this.othersToolStripMenuItem.Size = new System.Drawing.Size(72, 26);
+            this.othersToolStripMenuItem.Size = new System.Drawing.Size(72, 24);
             this.othersToolStripMenuItem.Text = "Others";
             this.othersToolStripMenuItem.Click += new System.EventHandler(this.othersToolStripMenuItem_Click);
             // 
@@ -123,9 +126,11 @@
             this.tableLayoutPanel1.Controls.Add(this.zdn, 4, 1);
             this.tableLayoutPanel1.Controls.Add(this.Generate, 2, 1);
             this.tableLayoutPanel1.Controls.Add(this.DebugLabel, 2, 0);
+            this.tableLayoutPanel1.Controls.Add(this.drawTile, 3, 0);
+            this.tableLayoutPanel1.Controls.Add(this.panview, 4, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 506);
-            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(4);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -137,7 +142,7 @@
             // zdn
             // 
             this.zdn.Location = new System.Drawing.Point(314, 42);
-            this.zdn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.zdn.Margin = new System.Windows.Forms.Padding(4);
             this.zdn.Name = "zdn";
             this.zdn.Size = new System.Drawing.Size(100, 29);
             this.zdn.TabIndex = 6;
@@ -148,7 +153,7 @@
             // Generate
             // 
             this.Generate.Location = new System.Drawing.Point(31, 42);
-            this.Generate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Generate.Margin = new System.Windows.Forms.Padding(4);
             this.Generate.Name = "Generate";
             this.Generate.Size = new System.Drawing.Size(100, 29);
             this.Generate.TabIndex = 7;
@@ -166,14 +171,36 @@
             this.DebugLabel.TabIndex = 8;
             this.DebugLabel.Text = "DEBUG";
             // 
+            // drawTile
+            // 
+            this.drawTile.Location = new System.Drawing.Point(145, 3);
+            this.drawTile.Name = "drawTile";
+            this.drawTile.Size = new System.Drawing.Size(84, 23);
+            this.drawTile.TabIndex = 9;
+            this.drawTile.Text = "Draw Tile";
+            this.drawTile.UseVisualStyleBackColor = true;
+            this.drawTile.Click += new System.EventHandler(this.drawTile_Click);
+            // 
+            // panview
+            // 
+            this.panview.Location = new System.Drawing.Point(313, 3);
+            this.panview.Name = "panview";
+            this.panview.Size = new System.Drawing.Size(101, 23);
+            this.panview.TabIndex = 10;
+            this.panview.Text = "Pan View";
+            this.panview.UseVisualStyleBackColor = true;
+            this.panview.Click += new System.EventHandler(this.panview_Click);
+            // 
             // tableLayoutPanel2
             // 
             this.tableLayoutPanel2.BackColor = System.Drawing.Color.Transparent;
-            this.tableLayoutPanel2.ColumnCount = 1;
+            this.tableLayoutPanel2.ColumnCount = 2;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 671F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel2.Controls.Add(this.pictureBox1, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.debugText, 1, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 30);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 28);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -181,19 +208,35 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(1049, 476);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(1049, 478);
             this.tableLayoutPanel2.TabIndex = 9;
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Left;
             this.pictureBox1.Location = new System.Drawing.Point(4, 4);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(1041, 468);
+            this.pictureBox1.Size = new System.Drawing.Size(635, 470);
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
             this.pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
+            this.pictureBox1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseDown);
+            this.pictureBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseMove);
+            this.pictureBox1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseUp);
+            // 
+            // debugText
+            // 
+            this.debugText.AcceptsReturn = true;
+            this.debugText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.debugText.Location = new System.Drawing.Point(674, 3);
+            this.debugText.Multiline = true;
+            this.debugText.Name = "debugText";
+            this.debugText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.debugText.Size = new System.Drawing.Size(372, 472);
+            this.debugText.TabIndex = 2;
             // 
             // MainForm
             // 
@@ -205,7 +248,7 @@
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.tableLayoutPanel1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MainForm";
             this.Text = "Form1";
             this.Activated += new System.EventHandler(this.MainForm_Activated);
@@ -214,6 +257,7 @@
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
+            this.tableLayoutPanel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -233,6 +277,9 @@
         private System.Windows.Forms.Label DebugLabel;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Button drawTile;
+        private System.Windows.Forms.Button panview;
+        private System.Windows.Forms.TextBox debugText;
     }
 }
 

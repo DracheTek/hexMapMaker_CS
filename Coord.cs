@@ -12,7 +12,6 @@ namespace hexMapMaker_CS
     {
         //public static int[] pic_canvas(int x, int y)
         //{
-
         //}
         public static int[] canvas_pic(int x, int y, int xoff = 0, int yoff = 0)
         {
@@ -27,22 +26,24 @@ namespace hexMapMaker_CS
         public static int[] pic_map(int x, int y, int xoff, int yoff)
         {
             int[] ret = { 0, 0 };
+            GraphicsPath p = new GraphicsPath();
+            p.AddLines(SETTINGS.hex_path_tc_pic(0, 0));
+            Region r = new Region(p);
             if (SETTINGS.TRUE_COL)
             {
                 for (int mx = 0; mx < SETTINGS.COL; mx++) // this is to make sure of the accuracy at intersection.
                 {
                     for (int my = 0; my < SETTINGS.ROW; my++)
                     {
-                        GraphicsPath p = new GraphicsPath();
-                        int[] picCoordToCheck = map_pic(mx, my, xoff, yoff);
-                        p.AddLines(SETTINGS.hex_path_tc_pic(picCoordToCheck[0], picCoordToCheck[1]));
-                        if (p.IsVisible(x, y))
+                        if (r.IsVisible(x, y))
                         {
                             ret[0] = mx;
                             ret[1] = my;
                             return ret;
                         }
+                        r.Translate(0, SETTINGS.HEIGHT);
                     }
+                    r.Translate(SETTINGS.WIDTH*3/4, ((mx%2 == 0)? 1:-1)*SETTINGS.HEIGHT/2 - SETTINGS.HEIGHT * (SETTINGS.COL));
                 }
                 ret[0] = -1;
                 ret[1] = -1;
@@ -50,30 +51,32 @@ namespace hexMapMaker_CS
             }
             else
             {
-                for (int mx = 0; mx < SETTINGS.COL; mx++) // this is to make sure of the accuracy at intersection.
+                for (int my = 0; my < SETTINGS.ROW; my++) // this is to make sure of the accuracy at intersection.
                 {
-                    for (int my = 0; my < SETTINGS.ROW; my++)
+                    for (int mx = 0; mx < SETTINGS.COL; mx++)
                     {
-                        GraphicsPath p = new GraphicsPath();
-                        int[] picCoordToCheck = map_pic(mx, my, xoff, yoff);
-                        p.AddLines(SETTINGS.hex_path_tr(picCoordToCheck[0], picCoordToCheck[1]));
-                        if (p.IsVisible(x, y))
+                        if (r.IsVisible(x, y))
                         {
                             ret[0] = mx;
                             ret[1] = my;
                             return ret;
                         }
+                        r.Translate(SETTINGS.WIDTH, 0);
                     }
+                    r.Translate(((my%2==0)?1:-1)* SETTINGS.WIDTH / 2 - SETTINGS.WIDTH * SETTINGS.ROW, SETTINGS.HEIGHT * 3 / 4);
                 }
                 ret[0] = -1;
                 ret[1] = -1;
                 return ret;
             }
         }
-        //public static int[] pic_map_fast(int x, int y) // only tests for the rectangular part.
-        //{
-
-        //}
+        public static int[] pic_map_fast(int x, int y) // only tests for the rectangular part.
+        {
+            int mx = x / (SETTINGS.WIDTH / 4 * 3); // flooring.
+            int my = (y - (mx % 2) * SETTINGS.HEIGHT / 2) / SETTINGS.HEIGHT;
+            //DebugLabel.Text = string.Format("x = {0:d}, y = {1:d}", mx, my);
+            return new int[] { mx, my };
+        }
         public static int[] map_pic(int x, int y, int anchor = 0)// 0: UL 1:L 2:DL 3:D 4:DR 5:R 6:UR 7:U 8:C 
         {
             int offx = 0, offy = 0;

@@ -15,8 +15,8 @@ namespace hexMapMaker_CS
     {
         static public int WIDTH = 40;
         static public int HEIGHT = 40;
-        static public int ROW = 120;
-        static public int COL = 120;
+        static public int ROW = 40;
+        static public int COL = 40;
         static public bool TRUE_COL = true;
         static public int UNDERLAY_OFF_X = 0, UNDERLAY_OFF_Y = 0;
         public static int[] XPT_TC = { WIDTH * 3 / 4, WIDTH, WIDTH * 3 / 4, WIDTH / 4, 0, WIDTH / 4 };
@@ -24,6 +24,68 @@ namespace hexMapMaker_CS
         public static int[] XPT_TR = { 0, WIDTH / 2, WIDTH, WIDTH, WIDTH / 2, 0 };
         public static int[] YPT_TR = { HEIGHT * 3 / 4, HEIGHT, HEIGHT * 3 / 4, HEIGHT / 4, 0, HEIGHT / 4 };
 
+        public static Point[] outer_border_tc()
+        {
+            List<Point> rtn = new List<Point>();
+            int x = WIDTH / 4;
+            int y = 0;
+            rtn.Add(new Point(x, y));
+            for (int i = 0; i < COL-1; i++)
+            {
+                x += WIDTH / 2;
+                rtn.Add(new Point(x, y));
+                if (i % 2 == 0)
+                {
+                    x += WIDTH / 4;
+                    y += HEIGHT / 2;
+                    rtn.Add(new Point(x, y));
+                }
+                else
+                {
+                    x += WIDTH / 4;
+                    y -= HEIGHT / 2;
+                    rtn.Add(new Point(x, y));
+                }
+            }
+            x += WIDTH / 2;
+            rtn.Add(new Point(x, y));
+            for (int i = 0; i < ROW; i++)
+            {
+                x += WIDTH / 4;
+                y += HEIGHT / 2;
+                rtn.Add(new Point(x, y));
+                x -= WIDTH / 4;
+                y += HEIGHT / 2;
+                rtn.Add(new Point(x, y));
+            }
+            for (int i = COL; i > 1; i--)
+            {
+                x -= WIDTH / 2;
+                rtn.Add(new Point(x, y));
+                if (i%2 == 0)
+                {
+                    x -= WIDTH / 4;
+                    y -= HEIGHT / 2;
+                }else
+                {
+                    x -= WIDTH / 4;
+                    y += HEIGHT / 2;
+                }
+                rtn.Add(new Point(x, y));
+            }
+            x -= WIDTH / 2;
+            rtn.Add(new Point(x, y));
+            for (int i = 0; i< ROW; i++)
+            {
+                x -= WIDTH / 4;
+                y -= HEIGHT / 2;
+                rtn.Add(new Point(x, y));
+                x += WIDTH / 4;
+                y -= HEIGHT / 2;
+                rtn.Add(new Point(x, y));
+            }
+            return rtn.ToArray();
+        }
         public static Point[] hex_tc_pic(int xoff, int yoff)
         {
             Point[] temp = new Point[6];
@@ -43,28 +105,88 @@ namespace hexMapMaker_CS
 
         public static Point[] hex_tc_grid(int xoff, int yoff) // this may be used anywhere. must get ready raw version and grid coord version.
         {
-            //yoff = yoff * HEIGHT + HEIGHT / 2 * (xoff % 2);
-            //xoff = (xoff * WIDTH * 3 / 4);
             return hex_tc_pic(xoff * WIDTH * 3 / 4, yoff * HEIGHT + HEIGHT / 2 * (xoff % 2));
         }
         public static Point[] hex_path_tc_grid(int xoff, int yoff)
         {
             return hex_path_tc_pic(xoff * WIDTH * 3 / 4, yoff * HEIGHT + HEIGHT / 2 * (xoff % 2));
-            //yoff = (yoff * HEIGHT + HEIGHT / 2 * (xoff % 2));
-            //xoff = (xoff * WIDTH * 3 / 4);
+        }
 
-            //Point[] temp = new Point[7];
-            //for (int i = 0; i < 6; i++)
-            //{
-            //    temp[i] = new Point(XPT_TC[i] + xoff, YPT_TC[i] + yoff);
-            //}
-            //temp[6] = new Point(XPT_TC[0] + xoff, YPT_TC[0] + yoff);
-            //return temp;
+        public static Point[] hex_path_brush_tc_pic(int xoff, int yoff, int r)
+        {
+            List<Point> rtn = new List<Point>();
+            int x = xoff + WIDTH/4;
+            int y = yoff - HEIGHT * r;
+            rtn.Add(new Point(x, y));
+            for (int i = 0; i< r + 1; i++)
+            {
+                x += WIDTH / 2;
+                rtn.Add(new Point(x, y));
+                x += WIDTH / 4;
+                y += HEIGHT / 2;
+                rtn.Add(new Point(x, y));
+            }
+            for (int i = 0; i<r;i++)
+            {
+                x -= WIDTH / 4;
+                y += HEIGHT / 2;
+                rtn.Add(new Point(x, y));
+                x += WIDTH / 4;
+                y += HEIGHT / 2;
+                rtn.Add(new Point(x, y));
+            }
+            for (int i = 0; i<r+1; i++)
+            {
+                x -= WIDTH / 4;
+                y += HEIGHT / 2;
+                rtn.Add(new Point(x, y));
+                x -= WIDTH / 2;
+                rtn.Add(new Point(x, y));
+            }
+            x -= WIDTH / 4;
+            y -= HEIGHT / 2;
+            rtn.Add(new Point(x, y));
+            for (int i = 0; i<r; i++)
+            {
+                x -= WIDTH / 2;
+                rtn.Add(new Point(x, y));
+                x -= WIDTH / 4;
+                y -= HEIGHT / 2;
+                rtn.Add(new Point(x, y));
+            }
+            x += WIDTH / 4;
+            y -= HEIGHT / 2;
+            rtn.Add(new Point(x, y));
+
+            for (int i = 0; i<r;i++)
+            {
+                x -= WIDTH / 4;
+                y -= HEIGHT / 2;
+                rtn.Add(new Point(x, y));
+                x += WIDTH / 4;
+                y -= HEIGHT / 2;
+                rtn.Add(new Point(x, y));
+            }
+            for (int i = 0; i< r; i++)
+            {
+                x += WIDTH / 2;
+                rtn.Add(new Point(x, y));
+                x += WIDTH / 4;
+                y -= HEIGHT / 2;
+                rtn.Add(new Point(x, y));
+            }
+            return rtn.ToArray();
+        }
+        public static Point[] hex_path_brush_tc_grid(int xoff, int yoff, int r)
+        {
+            int[] grid = Coord.map_pic(xoff, yoff);
+            return hex_path_brush_tc_pic(grid[0] , grid[1] , r);
         }
         //public static Point[] hex_tr_pic(int xoff, int yoff)
         //{
 
         //}
+
         public static Point[] hex_tr(int xoff, int yoff)
         {
             xoff = (xoff * WIDTH + WIDTH / 2 * (xoff % 2));

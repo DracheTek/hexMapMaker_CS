@@ -18,38 +18,53 @@ namespace hexMapMaker_CS
         static public int ROW = 120;
         static public int COL = 120;
         static public bool TRUE_COL = true;
+        static public int UNDERLAY_OFF_X = 0, UNDERLAY_OFF_Y = 0;
         public static int[] XPT_TC = { WIDTH * 3 / 4, WIDTH, WIDTH * 3 / 4, WIDTH / 4, 0, WIDTH / 4 };
-        public static int[] YPT_TC ={ 0, HEIGHT / 2, HEIGHT, HEIGHT, HEIGHT / 2, 0 };
+        public static int[] YPT_TC = { 0, HEIGHT / 2, HEIGHT, HEIGHT, HEIGHT / 2, 0 };
         public static int[] XPT_TR = { 0, WIDTH / 2, WIDTH, WIDTH, WIDTH / 2, 0 };
         public static int[] YPT_TR = { HEIGHT * 3 / 4, HEIGHT, HEIGHT * 3 / 4, HEIGHT / 4, 0, HEIGHT / 4 };
 
-        public static Point[] hex_tc(int xoff, int yoff)
+        public static Point[] hex_tc_pic(int xoff, int yoff)
         {
-            yoff = (yoff * HEIGHT + HEIGHT / 2 * (xoff % 2));
-            xoff = (xoff * WIDTH * 3 / 4);
-
             Point[] temp = new Point[6];
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i< 6; i++)
             {
                 temp[i] = new Point(XPT_TC[i] + xoff, YPT_TC[i] + yoff);
-            
             }
             return temp;
         }
-        public static Point[] hex_path_tc(int xoff, int yoff)
+        public static Point[] hex_path_tc_pic(int xoff, int yoff)
         {
-            yoff = (yoff * HEIGHT + HEIGHT / 2 * (xoff % 2));
-            xoff = (xoff * WIDTH * 3 / 4);
-
             Point[] temp = new Point[7];
-            for (int i = 0; i < 6; i++)
-            {
-                temp[i] = new Point(XPT_TC[i] + xoff, YPT_TC[i] + yoff);
-            }
-            temp[6] = new Point(XPT_TC[0] + xoff, YPT_TC[0] + yoff);
+            Array.Copy(hex_tc_pic(xoff,yoff), temp, 6);
+            temp[6] = temp[0];
             return temp;
         }
 
+        public static Point[] hex_tc_grid(int xoff, int yoff) // this may be used anywhere. must get ready raw version and grid coord version.
+        {
+            //yoff = yoff * HEIGHT + HEIGHT / 2 * (xoff % 2);
+            //xoff = (xoff * WIDTH * 3 / 4);
+            return hex_tc_pic(xoff * WIDTH * 3 / 4, yoff * HEIGHT + HEIGHT / 2 * (xoff % 2));
+        }
+        public static Point[] hex_path_tc_grid(int xoff, int yoff)
+        {
+            return hex_path_tc_pic(xoff * WIDTH * 3 / 4, yoff * HEIGHT + HEIGHT / 2 * (xoff % 2));
+            //yoff = (yoff * HEIGHT + HEIGHT / 2 * (xoff % 2));
+            //xoff = (xoff * WIDTH * 3 / 4);
+
+            //Point[] temp = new Point[7];
+            //for (int i = 0; i < 6; i++)
+            //{
+            //    temp[i] = new Point(XPT_TC[i] + xoff, YPT_TC[i] + yoff);
+            //}
+            //temp[6] = new Point(XPT_TC[0] + xoff, YPT_TC[0] + yoff);
+            //return temp;
+        }
+        //public static Point[] hex_tr_pic(int xoff, int yoff)
+        //{
+
+        //}
         public static Point[] hex_tr(int xoff, int yoff)
         {
             xoff = (xoff * WIDTH + WIDTH / 2 * (xoff % 2));
@@ -97,7 +112,7 @@ namespace hexMapMaker_CS
                 }
                 using (Graphics gs = Graphics.FromImage(stamp_tc))
                 {
-                    gs.FillPolygon(colorbrush, SETTINGS.hex_tc(0, 0));
+                    //gs.FillPolygon(colorbrush, SETTINGS.hex_tc(0, 0));
                 }
             }
         }

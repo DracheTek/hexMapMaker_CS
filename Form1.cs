@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 
 namespace hexMapMaker_CS
 {
@@ -28,6 +29,13 @@ namespace hexMapMaker_CS
         private Bitmap coordNum = new Bitmap(SETTINGS.WIDTH * SETTINGS.COL, SETTINGS.HEIGHT * SETTINGS.ROW);
         private byte[] pointType7 = { (byte)PathPointType.Start, 1, 1, 1, 1, 1, 128 };
         private List<Control> toolButtons = new List<Control>();
+
+        private int[] colormatrix_a = { 0, 0, 0, 0, 0 };
+        private int[] colormatrix_r = { 0, 1, 0, 0, 0 };
+        private int[] colormatrix_g = { 0, 0, 1, 0, 0 };
+        private int[] colormatrix_b = { 0, 0, 0, 1, 0 };
+        private int[] colormatrix_t = { 1, 0, 0, 0, 1 };
+        
         //private int[] brush3 = {
         //    0,1,
         //    1,0,
@@ -90,6 +98,8 @@ namespace hexMapMaker_CS
                 map = new Bitmap(w, h);
                 grid = new Bitmap(w, h);
                 coordNum = new Bitmap(w, h);
+
+                ColorMatrix CM = new Matrix()
 
                 toolButtons.Add(panview);
                 toolButtons.Add(drawTile);

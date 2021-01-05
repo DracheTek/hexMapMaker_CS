@@ -22,19 +22,19 @@ namespace hexMapMaker_CS
         private int x_zm, y_zm;
         private bool isDragging = false;
         private Font fnt = new Font("Arial", 10);
-        private byte[] pointType6 = { 0, 1, 1, 1, 1, 128 };
         private Image underlay = Image.FromFile("battlefield_overview.png");
-        private Bitmap map = new Bitmap(SETTINGS.WIDTH * SETTINGS.COL+10, SETTINGS.HEIGHT * SETTINGS.ROW+10);
-        private Bitmap grid = new Bitmap(SETTINGS.WIDTH * SETTINGS.COL, SETTINGS.HEIGHT * SETTINGS.ROW);
-        private Bitmap coordNum = new Bitmap(SETTINGS.WIDTH * SETTINGS.COL, SETTINGS.HEIGHT * SETTINGS.ROW);
-        private byte[] pointType7 = { (byte)PathPointType.Start, 1, 1, 1, 1, 1, 128 };
+        private Bitmap map = new Bitmap(SETTINGS.WIDTH * 3 / 4 * SETTINGS.COL + SETTINGS.WIDTH / 4 + 10, SETTINGS.HEIGHT * SETTINGS.ROW + SETTINGS.HEIGHT / 2 + 10);
+        private Bitmap grid = new Bitmap(SETTINGS.WIDTH * 3 / 4 * SETTINGS.COL + SETTINGS.WIDTH / 4 + 10, SETTINGS.HEIGHT * SETTINGS.ROW + SETTINGS.HEIGHT / 2 + 10);
+        private Bitmap coordNum = new Bitmap(SETTINGS.WIDTH * 3 / 4 * SETTINGS.COL + SETTINGS.WIDTH / 4 + 10, SETTINGS.HEIGHT * SETTINGS.ROW + SETTINGS.HEIGHT / 2 + 10);
         private List<Control> toolButtons = new List<Control>();
 
-        private int[] colormatrix_a = { 0, 0, 0, 0, 0 };
-        private int[] colormatrix_r = { 0, 1, 0, 0, 0 };
-        private int[] colormatrix_g = { 0, 0, 1, 0, 0 };
-        private int[] colormatrix_b = { 0, 0, 0, 1, 0 };
-        private int[] colormatrix_t = { 1, 0, 0, 0, 1 };
+        private float[] colormatrix_a = { 0, 0, 0, 0, 0 };
+        private float[] colormatrix_r = { 0, 1.0f, 0, 0, 0 };
+        private float[] colormatrix_g = { 0, 0, 1.0f, 0, 0 };
+        private float[] colormatrix_b = { 0, 0, 0, 1.0f, 0 };
+        private float[] colormatrix_t = { 1f, 0, 0, 0, 1.0f };
+        ColorMatrix CM = new ColorMatrix();
+        private Outline outline = new Outline();
         
         //private int[] brush3 = {
         //    0,1,
@@ -72,6 +72,8 @@ namespace hexMapMaker_CS
             return ret;
         }
 
+        // Initialize
+
         public MainForm()
         {
             pan_right_value = 0;
@@ -95,22 +97,25 @@ namespace hexMapMaker_CS
                     w = SETTINGS.WIDTH * SETTINGS.COL + SETTINGS.WIDTH / 2+10;
                     h = SETTINGS.HEIGHT * 3 / 4 * SETTINGS.ROW + SETTINGS.HEIGHT / 4+10;
                 }
-                map = new Bitmap(w, h);
-                grid = new Bitmap(w, h);
-                coordNum = new Bitmap(w, h);
+                //map = new Bitmap(8192, 8192);
+                //grid = new Bitmap(8192, 16383, PixelFormat.Format1bppIndexed);
+                //coordNum = new Bitmap(8192, 16383);
 
-                ColorMatrix CM = new Matrix()
+                ColorMatrix CM = new ColorMatrix(new float[][] { colormatrix_a, colormatrix_r, colormatrix_g, colormatrix_b, colormatrix_t, });
 
                 toolButtons.Add(panview);
                 toolButtons.Add(drawTile);
                 toolInUse = Tools.pan;
                 panview.Enabled = false;
                 initFlag = true;
+                Mapgen.ReadMap("1.txt");
             }
             // Controls.Add(pictureBox1);
             //pictureBox1.BackgroundImage = underlay;
 
         }
+
+        // Events
 
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
@@ -122,9 +127,78 @@ namespace hexMapMaker_CS
 
         }
 
+        private void Generate_Click(object sender, EventArgs e)
+        {
+            Pen blackpen = new Pen(Color.Black);
+            Pen redpen = new Pen(Color.Red);
+            Pen bluepen = new Pen(Color.Blue);
+            //SolidBrush brush = new SolidBrush(Color.Black);
+            //SolidBrush yellowbrush = new SolidBrush(Color.FromArgb(127, 255, 255, 0));
+            //Graphics gUnderlay = Graphics.FromImage(underlay);
+            Graphics gMap = Graphics.FromImage(map);
+            Graphics gText = Graphics.FromImage(coordNum);
+            Graphics gGrid = Graphics.FromImage(grid);
+            GraphicsPath stamppath = new GraphicsPath();
+            stamppath.AddLines(outline.hexPathPointOpen_tc);
+            Region stampregion = new Region(stamppath);
+            foreach (Point p in Mapgen.map.Keys)
+            {
+                int px = p.X * SETTINGS.WIDTH * 3 / 4;
+                int py = p.Y * SETTINGS.HEIGHT + SETTINGS.HEIGHT / 2 * (p.X % 2);
+                SolidBrush brush = new SolidBrush(Mapgen.stampBase[Mapgen.map[p]].color);
+                gMap.FillPolygon(brush, outline.Brush_Outline(px, py, 0, false));
+                gGrid.DrawPolygon(blackpen, outline.Brush_Outline(px, py, 0, false));
+                gText.DrawString(string.Format("{0:D},{1:D}", p.X, p.Y), fnt, new SolidBrush(blackpen.Color),px,py);
+                //stampregion.Translate(px,py);
+                //gMap.FillRegion(brush, stampregion);
+                //stampregion.Translate(-px, -py);
+
+            }
+            //gMap.DrawPolygon(blackpen,outline.mapOutlineOpen_tc);
+            //List<Point> ptsToDraw = new List<Point>();
+
+            //int i = 0;
+            //foreach(Point p in outline.BrushPathBase_tc[2])
+            //{
+            //    p.Offset(120, 120);
+            //    ptsToDraw.Add(p);
+            //}
+            //gMap.DrawPolygon(redpen, ptsToDraw.ToArray());
+            //gMap.DrawPolygon(blackpen, outline.BrushPathBase_tr[1]);
+            //gMap.DrawPolygon(bluepen, outline.BrushPathBase_tr[2]);
+            //i = 0;
+            //foreach (Point p in ptsToDraw)
+            //{
+            //    gText.DrawString(i.ToString(), new Font("Arial", 8), yellowbrush, p);
+            //    i++;
+            //}
+            //for (int x = 0; x < SETTINGS.COL; x++)
+            //{
+            //    for (int y = 0; y < SETTINGS.ROW; y++)
+            //    {
+            //        gMap.FillPolygon(yellowbrush, SETTINGS.hex_tc_grid(x, y));
+            //        int[] txtpos = Coord.map_pic(x, y);
+            //        gText.DrawString(string.Format("{0:D}:{1:D}", x, y), fnt, new SolidBrush(Color.Black), new Point(txtpos[0], txtpos[1]));
+            //        //gGrid.DrawPolygon(blackpen, SETTINGS.hex_tc_grid(x, y));
+            //        gGrid.DrawLines(blackpen, SETTINGS.outer_border_tc());
+            //    }
+            //}
+            gMap.Dispose();
+            gText.Dispose();
+            gGrid.Dispose();
+            blackpen.Dispose();
+            //yellowbrush.Dispose();
+            pictureBox1.Invalidate();
+
+        }
+
         private void zup_Click(object sender, EventArgs e)
         {
             DebugLabel.Text = "Zoom + Clicked";
+        }
+        private void zdn_Click(object sender, EventArgs e)
+        {
+
         }
 
         private void aup_Click(object sender, EventArgs e)
@@ -147,38 +221,9 @@ namespace hexMapMaker_CS
 
         }
 
-        private void zdn_Click(object sender, EventArgs e)
-        {
 
-        }
 
-        private void Generate_Click(object sender, EventArgs e)
-        {
-            Pen blackpen = new Pen(Color.Black);
-            SolidBrush yellowbrush = new SolidBrush(Color.FromArgb(127, 255, 255, 0));
-            // Graphics gUnderlay = Graphics.FromImage(underlay);
-            Graphics gMap = Graphics.FromImage(map);
-            Graphics gText = Graphics.FromImage(coordNum);
-            Graphics gGrid = Graphics.FromImage(grid);
-            for (int x = 0; x< SETTINGS.COL; x++)
-            {
-                for (int y = 0; y< SETTINGS.ROW; y++)
-                {
-                    gMap.FillPolygon(yellowbrush, SETTINGS.hex_tc_grid(x, y));
-                    int[] txtpos = Coord.map_pic(x, y);
-                    gText.DrawString(string.Format("{0:D}:{1:D}", x, y), fnt, new SolidBrush(Color.Black), new Point(txtpos[0],txtpos[1]));
-                    //gGrid.DrawPolygon(blackpen, SETTINGS.hex_tc_grid(x, y));
-                    gGrid.DrawLines(blackpen, SETTINGS.outer_border_tc());
-                }
-            }
-            gMap.Dispose();
-            gText.Dispose();
-            gGrid.Dispose();
-            blackpen.Dispose();
-            yellowbrush.Dispose();
-            pictureBox1.Invalidate();
-            
-        }
+
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
@@ -231,21 +276,21 @@ namespace hexMapMaker_CS
 
 
 
-            Graphics gm = Graphics.FromImage(map);
-            GraphicsPath gp = new GraphicsPath();
-            GraphicsPath ol = new GraphicsPath();
-            int[] piccoord = Coord.canvas_pic(x, y, this.pan_right_value, this.pan_down_value);
-            int[] gridcoord = Coord.pic_map(piccoord[0], piccoord[1], 0, 0);
-            gp.AddLines(SETTINGS.hex_path_brush_tc_grid(gridcoord[0], gridcoord[1], ((int)numericUpDown1.Value - 1) / 2));
-            ol.AddLines(SETTINGS.outer_border_tc());
-            Region rp = new Region(gp);
-            Region o = new Region(ol);
-            gm.IntersectClip(rp);
-            gm.IntersectClip(o);
-            //gm.DrawImage()
-            //gm.FillPath(redbrush,gp);
-            gm.Clear(Color.FromArgb(30, 255, 0, 0));
-            pictureBox1.Invalidate();
+            //Graphics gm = Graphics.FromImage(map);
+            //GraphicsPath gp = new GraphicsPath();
+            //GraphicsPath ol = new GraphicsPath();
+            //int[] piccoord = Coord.canvas_pic(x, y, this.pan_right_value, this.pan_down_value);
+            //int[] gridcoord = Coord.pic_map(piccoord[0], piccoord[1], 0, 0);
+            //gp.AddLines(SETTINGS.hex_path_brush_tc_grid(gridcoord[0], gridcoord[1], ((int)numericUpDown1.Value - 1) / 2));
+            //ol.AddLines(SETTINGS.outer_border_tc());
+            //Region rp = new Region(gp);
+            //Region o = new Region(ol);
+            //gm.IntersectClip(rp);
+            //gm.IntersectClip(o);
+            ////gm.DrawImage()
+            ////gm.FillPath(redbrush,gp);
+            //gm.Clear(Color.FromArgb(30, 255, 0, 0));
+            //pictureBox1.Invalidate();
         }
 
 
@@ -261,22 +306,12 @@ namespace hexMapMaker_CS
             int posy = e.Y;
             isDragging = true;
             int[] piccoord = Coord.canvas_pic(posx, posy, this.pan_right_value, this.pan_down_value);
-            int[] gridcoord = Coord.pic_map(piccoord[0], piccoord[1], 0, 0);
+            //int[] gridcoord = Coord.pic_map(piccoord[0], piccoord[1], 0, 0);
             switch (toolInUse)
             {
                 case Tools.draw:
                     DrawMapTile(e.X, e.Y);
-                    //PictureBox1.Invalidate();
-                    //Graphics gm = Graphics.FromImage(map);
-                    //GraphicsPath gp = new GraphicsPath();
-                    ////gp.AddLines(SETTINGS.hex_path_tc_grid(gridcoord[0], gridcoord[1]));
-                    //gp.AddLines(SETTINGS.hex_path_brush_tc_grid(gridcoord[0], gridcoord[1], ((int)numericUpDown1.Value-1)/2));
-                    //Region rp = new Region(gp);
-                    //SolidBrush redbrush = new SolidBrush(Color.Red);
-                    //gm.IntersectClip(rp);
-                    ////gm.FillPath(redbrush,gp);
-                    //gm.Clear(Color.FromArgb(127, 255, 0, 0));
-                    //pictureBox1.Invalidate();
+
                     break;
                 case Tools.pan:
 

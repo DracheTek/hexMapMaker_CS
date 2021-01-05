@@ -8,6 +8,7 @@ namespace hexMapMaker_CS
 {
     static class Program
     {
+        private static string nl = System.Environment.NewLine;
         /// <summary>
         /// 应用程序的主入口点。
         /// </summary>

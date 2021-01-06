@@ -73,10 +73,31 @@ namespace hexMapMaker_CS
         public static int[] pic_map_fast(int x, int y) // only tests for the rectangular part.
         {
             int mx = x / (SETTINGS.WIDTH / 4 * 3); // flooring.
+            double x_rmd = x % (SETTINGS.WIDTH / 4 * 3);
             int my = (y - (mx % 2) * SETTINGS.HEIGHT / 2) / SETTINGS.HEIGHT;
+            double y_rmd = (y - (mx % 2) * SETTINGS.HEIGHT / 2) % SETTINGS.HEIGHT;
+            double yp =y_rmd - SETTINGS.HEIGHT/2;
+            double k = (SETTINGS.HEIGHT / 2) / (SETTINGS.WIDTH / 4);
+            if (x_rmd/3 == 0)
+            {
+                if (yp > x_rmd * k)
+                {
+                    mx--;
+                    my++;
+                }else if (yp < -x_rmd * k)
+                {
+                    mx--;
+                }
+            }
+
             //DebugLabel.Text = string.Format("x = {0:d}, y = {1:d}", mx, my);
             return new int[] { mx, my };
         }
+        public static int[] pic_map_fast(int[] xy) // only tests for the rectangular part.
+        {
+            return pic_map_fast(xy[0], xy[1]);
+        }
+
         public static int[] map_pic(int x, int y, int anchor = 0)// 0: UL 1:L 2:DL 3:D 4:DR 5:R 6:UR 7:U 8:C 
         {
             int offx = 0, offy = 0;

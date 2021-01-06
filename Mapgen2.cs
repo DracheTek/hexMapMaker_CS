@@ -11,10 +11,10 @@ namespace hexMapMaker_CS
 {
     public static class SETTINGS
     {
-        public static int WIDTH = 120;
-        public static int HEIGHT = 120;
-        public static int ROW = 120;
-        public static int COL = 120;
+        public static int WIDTH = 48;
+        public static int HEIGHT = 48;
+        public static int ROW = 12;
+        public static int COL = 12;
         public static bool TRUE_COL = true;
     }
     public class Outline // remember to initialize this at Form.
@@ -57,6 +57,22 @@ namespace hexMapMaker_CS
                 SETTINGS.TRUE_COL = true;
                 BrushPathBase_tc.Add(Brush_Outline(0, 0, i, false));
             }
+        }
+
+        public Point[] getOffsetPointArr(Point[] brush, Point p)
+        {
+            List<Point> rtn = new List<Point>();
+            foreach (Point pp in brush)
+            {
+                pp.Offset(p);
+                rtn.Add(pp);
+            }
+            return rtn.ToArray();
+        }
+        public Point[] getOffsetPointArr(Point[] brush, int x, int y)
+        {
+            Point p = new Point(x, y);
+            return getOffsetPointArr(brush, p);
         }
 
          void Move_Right(List<Point> pl)
@@ -151,15 +167,16 @@ namespace hexMapMaker_CS
             }
             pl.Add(new Point(x, y));
         }
-        public  Point[] Brush_Outline(int xoff, int yoff, int r, bool close = false)
+        public  Point[] Brush_Outline(int x_pic, int y_pic, int r, bool close = false)
             // draw a hexagon with r layers. single hexagon is r = 0.
+            //
         {
             List<Point> rtn = new List<Point>();
             int x = 0, y = 0;
             if (SETTINGS.TRUE_COL)
             {
-                x = xoff + SETTINGS.WIDTH / 4;
-                y = yoff - SETTINGS.HEIGHT * r;
+                x = x_pic + SETTINGS.WIDTH / 4;
+                y = y_pic - SETTINGS.HEIGHT * r;
                 rtn.Add(new Point(x, y));
                 Move_Right(rtn);
                 for (int i = 0; i< r; i++)
@@ -348,11 +365,13 @@ namespace hexMapMaker_CS
     static class Mapgen
     {
         //public static List<List<string>> map = new List<List<string>>();
-        public static Dictionary<Point, string> map = new Dictionary<Point, string>();
+        public static Dictionary<Point, string> map = new Dictionary<Point, string>(); // 网格坐标和点的对应
+        public static Dictionary<Point, string> map_p = new Dictionary<Point, string>(); // 图面坐标和点的对应
         public static Dictionary<string, Stamp> stampBase = new Dictionary<string, Stamp>();
         public static void ReadMap(string path)
         {
             string readstate = "";
+            int wmax = 0, hmax = 0;
             try
             {
                 using (StreamReader sr = new StreamReader(path))
@@ -367,20 +386,23 @@ namespace hexMapMaker_CS
                                 switch (readstate)
                                 {
                                     case "hexunitdef":
-                                        string[] node = line.Split(new char[] { ',' });
+                                        string[] node = line.Split(',');
                                         int r = 0, g = 0, b = 0;
                                         int.TryParse(node[1], out r);
                                         int.TryParse(node[2], out g);
                                         int.TryParse(node[3], out b);
-
                                         stampBase.Add(node[0], new Stamp(node[0], node[0], 255, r, g, b));
                                         break;
                                     case "coorddef":
                                         string[] node2 = line.Split(',');
                                         int x = 0, y = 0;
                                         int.TryParse(node2[0], out x);
+                                        wmax = wmax > x ? wmax : x;
                                         int.TryParse(node2[1], out y);
+                                        hmax = hmax > y ? hmax : y;
                                         map.Add(new Point(x, y), node2[2]);
+                                        int[] mp = Coord.map_pic(x,y);
+                                        map_p.Add(new Point(mp[0], mp[1]), node2[2]);
                                         break;
                                 }
 
@@ -398,6 +420,8 @@ namespace hexMapMaker_CS
             {
                 System.Windows.Forms.MessageBox.Show("File not found");
             }
+            SETTINGS.COL = wmax;
+            SETTINGS.ROW = hmax;
         }
     }
 }

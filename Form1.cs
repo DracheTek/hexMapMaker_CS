@@ -21,19 +21,25 @@ namespace hexMapMaker_CS
         private int pan_right_value, pan_down_value, x0, y0;
         private int x_zm, y_zm;
         private bool isDragging = false;
-        private Font fnt = new Font("Arial", 10);
-        private Image underlay = Image.FromFile("battlefield_overview.png");
-        private Bitmap map = new Bitmap(SETTINGS.WIDTH * 3 / 4 * SETTINGS.COL + SETTINGS.WIDTH / 4 + 10, SETTINGS.HEIGHT * SETTINGS.ROW + SETTINGS.HEIGHT / 2 + 10);
-        private Bitmap grid = new Bitmap(SETTINGS.WIDTH * 3 / 4 * SETTINGS.COL + SETTINGS.WIDTH / 4 + 10, SETTINGS.HEIGHT * SETTINGS.ROW + SETTINGS.HEIGHT / 2 + 10);
-        private Bitmap coordNum = new Bitmap(SETTINGS.WIDTH * 3 / 4 * SETTINGS.COL + SETTINGS.WIDTH / 4 + 10, SETTINGS.HEIGHT * SETTINGS.ROW + SETTINGS.HEIGHT / 2 + 10);
+        private Font fnt = new Font("Bahnschrift", 48);
+        private Image underlay = Image.FromFile("super_big_picture.png");
+        //private Image mapImg, gridImg, coordImg;
+        //private Bitmap underlay_bmp;
+        private Bitmap map;// = new Bitmap(SETTINGS.WIDTH * 3 / 4 * SETTINGS.COL + SETTINGS.WIDTH / 4 + 10, SETTINGS.HEIGHT * SETTINGS.ROW + SETTINGS.HEIGHT / 2 + 10);
+        private Bitmap grid;// = new Bitmap(SETTINGS.WIDTH * 3 / 4 * SETTINGS.COL + SETTINGS.WIDTH / 4 + 10, SETTINGS.HEIGHT * SETTINGS.ROW + SETTINGS.HEIGHT / 2 + 10, PixelFormat.Format1bppIndexed);
+        private Bitmap coordNum;// = new Bitmap(SETTINGS.WIDTH * 3 / 4 * SETTINGS.COL + SETTINGS.WIDTH / 4 + 10, SETTINGS.HEIGHT * SETTINGS.ROW + SETTINGS.HEIGHT / 2 + 10);
+        //private Bitmap[] maptiles;
         private List<Control> toolButtons = new List<Control>();
+        private ColorMap COLOR_MAP_ENTRY;
+        //private ColorPalette blackwhite;
 
-        private float[] colormatrix_a = { 0, 0, 0, 0, 0 };
-        private float[] colormatrix_r = { 0, 1.0f, 0, 0, 0 };
-        private float[] colormatrix_g = { 0, 0, 1.0f, 0, 0 };
-        private float[] colormatrix_b = { 0, 0, 0, 1.0f, 0 };
-        private float[] colormatrix_t = { 1f, 0, 0, 0, 1.0f };
-        ColorMatrix CM = new ColorMatrix();
+        private float[] colormatrix_r = { 1.0f, 0, 0, 0, 0 };
+        private float[] colormatrix_g = { 0, 1.0f, 0, 0, 0 };
+        private float[] colormatrix_b = { 0, 0, 1.0f, 0, 0 };
+        private float[] colormatrix_a = { 0, 0, 0, 1.0f, 0 };
+        private float[] colormatrix_t = { 0f, 0, 0, 0, 1.0f };
+        private float[][] cme;
+        ColorMatrix cm = new ColorMatrix();
         private Outline outline = new Outline();
         
         //private int[] brush3 = {
@@ -45,40 +51,41 @@ namespace hexMapMaker_CS
         //    0,1
         //}
 
-        private List<Point> getSizedBrush(int r)
-        {
-            List<Point> ret = new List<Point>();
-            if (SETTINGS.TRUE_COL)
-            {
-                int ub = 2;
-                int lb = -2;
-                for (int i =0; i<= (r-1)/2; i++)
-                {
-                    for (int j = ub; j >= lb; j--)
-                    {
-                        ret.Add(new Point(i, j));
-                        if (i>0)
-                        {
-                            ret.Add(new Point(-i, j));
-                        }
-                    }
-                    if (i % 2 == 0)
-                    {
-                        lb += 1;
-                    }
-                    else ub -= 1;
-                }
-            }
-            return ret;
-        }
-
         // Initialize
 
         public MainForm()
         {
+            int w = 0, h = 0;
+            if (SETTINGS.TRUE_COL)
+            {
+                w = SETTINGS.WIDTH * 3 / 4 * SETTINGS.COL + SETTINGS.WIDTH / 4 + 10;
+                h = SETTINGS.HEIGHT * SETTINGS.ROW + SETTINGS.HEIGHT / 2 + 10;
+            }
+            else
+            {
+                w = SETTINGS.WIDTH * SETTINGS.COL + SETTINGS.WIDTH / 2 + 10;
+                h = SETTINGS.HEIGHT * 3 / 4 * SETTINGS.ROW + SETTINGS.HEIGHT / 4 + 10;
+            }
             pan_right_value = 0;
             pan_down_value = 0;
-
+            cme = new float[][] { colormatrix_r, colormatrix_g, colormatrix_b, colormatrix_a, colormatrix_t };
+            cm = new ColorMatrix(cme);
+            Bitmap maptemplate = new Bitmap(w, h,PixelFormat.Format24bppRgb);
+            Graphics gt = Graphics.FromImage(maptemplate);
+            //gt.FillRectangle(new SolidBrush(Color.Magenta), new Rectangle(0, 0, w, h));
+            //maptemplate.MakeTransparent(Color.Magenta);
+            map = (Bitmap)maptemplate.Clone();
+            grid = (Bitmap)maptemplate.Clone();
+            coordNum = (Bitmap)maptemplate.Clone();
+            maptemplate.Dispose();
+            COLOR_MAP_ENTRY = new ColorMap();
+            COLOR_MAP_ENTRY.OldColor = Color.Magenta;
+            COLOR_MAP_ENTRY.NewColor = Color.Transparent;
+            //underlay_bmp = new Bitmap(underlay);
+            //blackwhite = grid.Palette;  //这段操作必须是：先创建新的颜色表，再填写颜色表，最后把颜色表放回位图。
+            //blackwhite.Entries[0] = Color.Transparent;
+            //blackwhite.Entries[1] = Color.Black;
+            //grid.Palette = blackwhite;
             InitializeComponent();
 
         }
@@ -87,22 +94,6 @@ namespace hexMapMaker_CS
         {
             if (!initFlag)
             {
-                int w = 0, h =0;
-                if (SETTINGS.TRUE_COL)
-                {
-                    w = SETTINGS.WIDTH * 3 / 4 * SETTINGS.COL + SETTINGS.WIDTH / 4+10;
-                    h = SETTINGS.HEIGHT* SETTINGS.ROW+SETTINGS.HEIGHT/2+10;
-                }else
-                {
-                    w = SETTINGS.WIDTH * SETTINGS.COL + SETTINGS.WIDTH / 2+10;
-                    h = SETTINGS.HEIGHT * 3 / 4 * SETTINGS.ROW + SETTINGS.HEIGHT / 4+10;
-                }
-                //map = new Bitmap(8192, 8192);
-                //grid = new Bitmap(8192, 16383, PixelFormat.Format1bppIndexed);
-                //coordNum = new Bitmap(8192, 16383);
-
-                ColorMatrix CM = new ColorMatrix(new float[][] { colormatrix_a, colormatrix_r, colormatrix_g, colormatrix_b, colormatrix_t, });
-
                 toolButtons.Add(panview);
                 toolButtons.Add(drawTile);
                 toolInUse = Tools.pan;
@@ -129,60 +120,56 @@ namespace hexMapMaker_CS
 
         private void Generate_Click(object sender, EventArgs e)
         {
+            int w = 0, h = 0;
+
             Pen blackpen = new Pen(Color.Black);
-            Pen redpen = new Pen(Color.Red);
-            Pen bluepen = new Pen(Color.Blue);
-            //SolidBrush brush = new SolidBrush(Color.Black);
-            //SolidBrush yellowbrush = new SolidBrush(Color.FromArgb(127, 255, 255, 0));
-            //Graphics gUnderlay = Graphics.FromImage(underlay);
+            SolidBrush brush = new SolidBrush(Color.Black);
+
+            if (SETTINGS.TRUE_COL)
+            {
+                w = SETTINGS.WIDTH * 3 / 4 * SETTINGS.COL + SETTINGS.WIDTH + 10;
+                h = SETTINGS.HEIGHT * SETTINGS.ROW + SETTINGS.HEIGHT + 10;
+            }
+            else
+            {
+                w = SETTINGS.WIDTH * SETTINGS.COL + SETTINGS.WIDTH / 2 + 10;
+                h = SETTINGS.HEIGHT * 3 / 4 * SETTINGS.ROW + SETTINGS.HEIGHT / 4 + 10;
+            }
+            Bitmap maptemplate = new Bitmap(w, h, PixelFormat.Format24bppRgb);
+            map = (Bitmap)maptemplate.Clone();
+            grid = (Bitmap)maptemplate.Clone();
+            coordNum = (Bitmap)maptemplate.Clone();
+            maptemplate.Dispose();
+
             Graphics gMap = Graphics.FromImage(map);
             Graphics gText = Graphics.FromImage(coordNum);
             Graphics gGrid = Graphics.FromImage(grid);
+            brush.Color = Color.Magenta;
+            gMap.FillRectangle(brush, new Rectangle(0, 0, w, h));
+            gText.FillRectangle(brush, new Rectangle(0, 0, w, h));
+            gGrid.FillRectangle(brush, new Rectangle(0, 0, w, h));
+
+
             GraphicsPath stamppath = new GraphicsPath();
             stamppath.AddLines(outline.hexPathPointOpen_tc);
             Region stampregion = new Region(stamppath);
             foreach (Point p in Mapgen.map.Keys)
             {
-                int px = p.X * SETTINGS.WIDTH * 3 / 4;
-                int py = p.Y * SETTINGS.HEIGHT + SETTINGS.HEIGHT / 2 * (p.X % 2);
-                SolidBrush brush = new SolidBrush(Mapgen.stampBase[Mapgen.map[p]].color);
-                gMap.FillPolygon(brush, outline.Brush_Outline(px, py, 0, false));
-                gGrid.DrawPolygon(blackpen, outline.Brush_Outline(px, py, 0, false));
-                gText.DrawString(string.Format("{0:D},{1:D}", p.X, p.Y), fnt, new SolidBrush(blackpen.Color),px,py);
-                //stampregion.Translate(px,py);
-                //gMap.FillRegion(brush, stampregion);
-                //stampregion.Translate(-px, -py);
-
+                int[] pxy = Coord.map_pic(p.X, p.Y);
+                brush.Color = Mapgen.stampBase[Mapgen.map[p]].color;
+                gMap.FillPolygon(brush, outline.Brush_Outline(pxy[0], pxy[1], 0, false));
+                gGrid.DrawPolygon(blackpen, outline.Brush_Outline(pxy[0], pxy[1], 0, false));
+                gText.DrawString(string.Format("{0:D},{1:D}", p.X, p.Y), fnt, new SolidBrush(Color.Black), pxy[0], pxy[1]);
             }
+            //map.MakeTransparent(Color.Magenta);
+            //grid.MakeTransparent(Color.Magenta);
+            //coordNum.MakeTransparent(Color.Magenta); // 一旦用了MakeTransparent，图像属性会变回32ARGB
+            //DebugLabel.Text = map.PixelFormat.ToString();
             //gMap.DrawPolygon(blackpen,outline.mapOutlineOpen_tc);
             //List<Point> ptsToDraw = new List<Point>();
 
-            //int i = 0;
-            //foreach(Point p in outline.BrushPathBase_tc[2])
-            //{
-            //    p.Offset(120, 120);
-            //    ptsToDraw.Add(p);
-            //}
-            //gMap.DrawPolygon(redpen, ptsToDraw.ToArray());
-            //gMap.DrawPolygon(blackpen, outline.BrushPathBase_tr[1]);
-            //gMap.DrawPolygon(bluepen, outline.BrushPathBase_tr[2]);
-            //i = 0;
-            //foreach (Point p in ptsToDraw)
-            //{
-            //    gText.DrawString(i.ToString(), new Font("Arial", 8), yellowbrush, p);
-            //    i++;
-            //}
-            //for (int x = 0; x < SETTINGS.COL; x++)
-            //{
-            //    for (int y = 0; y < SETTINGS.ROW; y++)
-            //    {
-            //        gMap.FillPolygon(yellowbrush, SETTINGS.hex_tc_grid(x, y));
-            //        int[] txtpos = Coord.map_pic(x, y);
-            //        gText.DrawString(string.Format("{0:D}:{1:D}", x, y), fnt, new SolidBrush(Color.Black), new Point(txtpos[0], txtpos[1]));
-            //        //gGrid.DrawPolygon(blackpen, SETTINGS.hex_tc_grid(x, y));
-            //        gGrid.DrawLines(blackpen, SETTINGS.outer_border_tc());
-            //    }
-            //}
+
+            brush.Dispose();
             gMap.Dispose();
             gText.Dispose();
             gGrid.Dispose();
@@ -229,11 +216,19 @@ namespace hexMapMaker_CS
         {
             Graphics ge = e.Graphics;
 
-            ge.DrawImage(underlay, pan_right_value, pan_down_value); //TODO: change x, y to a more representative name.
-            ge.DrawImage(map, pan_right_value, pan_down_value);
-            ge.DrawImage(grid, pan_right_value, pan_down_value);
-            ge.DrawImage(coordNum, pan_right_value, pan_down_value);
-
+            ImageAttributes attr = new ImageAttributes();
+            //Rectangle sourcerect = new Rectangle(0, 0, underlay.Width, underlay.Height);
+            Rectangle destrect = new Rectangle(pan_right_value, pan_down_value, underlay.Width, underlay.Height);
+            Rectangle maprect = new Rectangle(pan_right_value, pan_down_value, map.Width, map.Height);
+            attr.SetColorMatrix(cm);
+            attr.SetRemapTable(new ColorMap[] { COLOR_MAP_ENTRY }, ColorAdjustType.Bitmap);
+            //attr.SetColorKey(Color.Magenta, Color.Black);
+            ge.DrawImage(underlay, destrect, 0,0,underlay.Width,underlay.Height, GraphicsUnit.Pixel, attr);
+            //ge.DrawImage(underlay, pan_right_value, pan_down_value,attr);
+            ge.DrawImage(map, maprect, 0,0,map.Width,map.Height,GraphicsUnit.Pixel,attr);
+            ge.DrawImage(grid, maprect, 0,0, grid.Width, grid.Height,GraphicsUnit.Pixel,attr);
+            ge.DrawImage(coordNum, maprect, 0,0, coordNum.Width, coordNum.Height,GraphicsUnit.Pixel,attr);
+            //ge.Dispose();
         }
 
         private void panview_Click(object sender, EventArgs e)
@@ -266,31 +261,90 @@ namespace hexMapMaker_CS
         }
 
         // reserved for bucket(flood fill)
-        private void DrawMapTile(int x, int y)
-        {
+        private void DrawMapTile(int x, int y, string newname)
             /*
-            之后要考虑和地图数据联动。考虑以下顺序：
-            从事件收到的位置数据是画布坐标。先把画布坐标转换成图面坐标。只要转换
-             
+             * 输入值是画布坐标。顺序如下：
+             * 将画布坐标转换成图面坐标和网格坐标。
+             * 按照网格坐标生成要更换名字的图面坐标和网格坐标。
+             * 更换图面坐标和网格坐标对应的颜色名字
+             * 在图面坐标所示点绘制多边形
              */
+        {
+            int[] pxy = Coord.canvas_pic(x, y, pan_right_value, pan_down_value);
+            int[] mxy = Coord.pic_map_fast(pxy);
+            int[] mpxy = Coord.map_pic(mxy[0], mxy[1]);
+            int mx = mxy[0], my = mxy[1];
+            int mxm = 0, mym = 0, pxm = 0, pym = 0;//short hand for map_x/y_modified
+            int r = (int)numericUpDown1.Value;
+            int ub = r;
+            int lb = -r;
+            Point mmp = new Point(0, 0); //short hand for map/pic_modified_point
+            Point mpp = new Point(0, 0);
 
 
+            Color newcolor = Mapgen.stampBase[newname].color;
+            Graphics gm = Graphics.FromImage(map);
+            GraphicsPath gp = new GraphicsPath();
+            GraphicsPath ol = new GraphicsPath();
+            gp.AddLines(outline.Brush_Outline(mpxy[0], mpxy[1], r, true));
+            ol.AddLines(outline.Map_Outline(true));
+            Region rp = new Region(gp);
+            Region o = new Region(ol);
+            gm.IntersectClip(rp);
+            gm.IntersectClip(o);
+            gm.Clear(newcolor);
+            pictureBox1.Invalidate();
+            gm.Dispose();
+            gp.Dispose();
+            ol.Dispose();
+            rp.Dispose();
+            o.Dispose();
 
-            //Graphics gm = Graphics.FromImage(map);
-            //GraphicsPath gp = new GraphicsPath();
-            //GraphicsPath ol = new GraphicsPath();
-            //int[] piccoord = Coord.canvas_pic(x, y, this.pan_right_value, this.pan_down_value);
-            //int[] gridcoord = Coord.pic_map(piccoord[0], piccoord[1], 0, 0);
-            //gp.AddLines(SETTINGS.hex_path_brush_tc_grid(gridcoord[0], gridcoord[1], ((int)numericUpDown1.Value - 1) / 2));
-            //ol.AddLines(SETTINGS.outer_border_tc());
-            //Region rp = new Region(gp);
-            //Region o = new Region(ol);
-            //gm.IntersectClip(rp);
-            //gm.IntersectClip(o);
-            ////gm.DrawImage()
-            ////gm.FillPath(redbrush,gp);
-            //gm.Clear(Color.FromArgb(30, 255, 0, 0));
-            //pictureBox1.Invalidate();
+
+            for (int i = 0; i <= r; i++)
+            {
+                for (int j = ub; j >= lb; j--)
+                {
+                    //ret.Add(new Point(i, j));
+                    if (my + j < SETTINGS.ROW && my + j > 0)
+                    {
+                        mym = my + j;
+                        if (mx + i < SETTINGS.COL)// 0 col and right col
+                        {
+                            mxm = mx + i;
+                            int[] pxym = Coord.map_pic(mxm, mym);
+                            mmp.X = mxm;
+                            mmp.Y = mym;
+                            mpp.X = pxym[0];
+                            mpp.Y = pxym[1];
+                            Mapgen.map[mmp] = newname;
+                            Mapgen.map_p[mpp] = newname;
+                        }
+                        if (i > 0) // left col
+                        {
+                            if (mx - i > 0)
+                            {
+                                mxm = mx - i;
+
+                                int[] pxym = Coord.map_pic(mxm, mym);
+                                mmp.X = mxm;
+                                mmp.Y = mym;
+                                mpp.X = pxym[0];
+                                mpp.Y = pxym[1];
+                                Mapgen.map[mmp] = newname;
+                                Mapgen.map_p[mpp] = newname;
+                            }
+                        }
+                    }
+                }
+                if (i % 2 == 0)
+                {
+                    lb += 1;
+                }
+                else ub -= 1;
+            }
+
+
         }
 
 
@@ -310,7 +364,7 @@ namespace hexMapMaker_CS
             switch (toolInUse)
             {
                 case Tools.draw:
-                    DrawMapTile(e.X, e.Y);
+                    DrawMapTile(e.X, e.Y, "grassland");
 
                     break;
                 case Tools.pan:
@@ -324,9 +378,11 @@ namespace hexMapMaker_CS
         {
             int x = e.X;
             int y = e.Y;
-            int mx = x / (SETTINGS.WIDTH / 4 * 3); // flooring.
-            int my = (y - (mx % 2) * SETTINGS.HEIGHT / 2) / SETTINGS.HEIGHT;
-            DebugLabel.Text = string.Format("x = {0:d}, y = {1:d}", mx, my);
+            int[] pxy = Coord.canvas_pic(new int[] { x, y },pan_right_value, pan_down_value);
+            int[] mxy = Coord.pic_map_fast(pxy[0], pxy[1]);
+            //int mx = x / (SETTINGS.WIDTH / 4 * 3); // flooring.
+            //int my = (y - (mx % 2) * SETTINGS.HEIGHT / 2) / SETTINGS.HEIGHT;
+            DebugLabel.Text = string.Format("x = {0:d}, y = {1:d}", mxy[0], mxy[1]);
             if (isDragging)
             {
             switch (toolInUse)
@@ -344,7 +400,7 @@ namespace hexMapMaker_CS
                         }
                         break;
                     case Tools.draw:
-                        DrawMapTile(e.X, e.Y);
+                        DrawMapTile(e.X, e.Y, "grassland");
                         //int posx = e.X;
                         //int posy = e.Y;
                         //int[] piccoord = Coord.canvas_pic(posx, posy, this.pan_right_value, this.pan_down_value);
